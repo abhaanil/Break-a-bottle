@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collaborative Bottle Click</title>
+    <script type="module">
+        // Import Firebase SDKs
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-analytics.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA6OjEtyFZHSifRv7CFi-wrGxXjcWqKTvo",
+            authDomain: "bottle-crash.firebaseapp.com",
+            projectId: "bottle-crash",
+            storageBucket: "bottle-crash.firebasestorage.app",
+            messagingSenderId: "264708798015",
+            appId: "1:264708798015:web:4531416f81d0206842aa8a",
+            measurementId: "G-D7DGZD6D7T"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+        const bottleRef = doc(db, "bottleClicks", "clickData");
+
+        const progressBar = document.getElementById("progressBar");
+        const bottle = document.getElementById("bottle");
+
+        // Function to update UI when data changes
+        function updateUI(clickCount) {
+            const progress = (clickCount / 100) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            if (clickCount >= 100) {
+                bottle.src = "broken-bottle.png";
+            } else if (clickCount >= 85) {
+                bottle.src = "bottle-stage3.png";
+            } else if (clickCount >= 75) {
+                bottle.src = "bottle-stage2.png";
+            } else if (clickCount >= 50) {
+                bottle.src = "bottle-stage1.png";
+            } else {
+                bottle.src = "bottle.png";
+            }
+        }
+
+        // Listen for real-time updates
+        onSnapshot(bottleRef, (docSnap) => {
+            if (docSnap.exists()) {
+                updateUI(docSnap.data().clicks);
+            }
+        });
+
+        window.clickBottle = async function () {
+            const docSnap = await getDoc(bottleRef);
+            if (docSnap.exists()) {
+                let clickCount = docSnap.data().clicks;
+                if (clickCount < 100) {
+                    await updateDoc(bottleRef, { clicks: clickCount + 1 });
+                }
+            } else {
+                await setDoc(bottleRef, { clicks: 1 });
+            }
+        }
+
+        window.resetCounter = async function () {
+            await setDoc(bottleRef, { clicks: 0 });
+        }
+    </script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+        }
+
+        #bottle {
+            width: 500px;
+            cursor: pointer;
+        }
+
+        #progressContainer {
+            width: 300px;
+            height: 10px;
+            background-color: #ddd;
+            border-radius: 10px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        #progressBar {
+            width: 0%;
+            height: 100%;
+            background-color: #1AC456;
+            transition: width 0.3s ease;
+        }
+
+        #resetButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: #ffffff;
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <img id="bottle" src="bottle.png" alt="Bottle" onclick="clickBottle()">
+    <div id="progressContainer">
+        <div id="progressBar"></div>
+    </div>
+    <button id="resetButton" onclick="resetCounter()">Dont click me</button>
+</body>
+
+</html>
