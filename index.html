@@ -30,19 +30,21 @@
 
         const progressBar = document.getElementById("progressBar");
         const bottle = document.getElementById("bottle");
+        const breakSound = new Audio("Applause.mp3");
 
         // Function to update UI when data changes
         function updateUI(clickCount) {
-            const progress = (clickCount / 100) * 100;
+            const progress = (clickCount / 200) * 100;
             progressBar.style.width = `${progress}%`;
 
-            if (clickCount >= 100) {
+            if (clickCount >= 200) {
                 bottle.src = "broken-bottle.png";
-            } else if (clickCount >= 85) {
+                breakSound.play(); // Play sound when the bottle breaks
+            } else if (clickCount >= 180) {
                 bottle.src = "bottle-stage3.png";
-            } else if (clickCount >= 75) {
+            } else if (clickCount >= 140) {
                 bottle.src = "bottle-stage2.png";
-            } else if (clickCount >= 50) {
+            } else if (clickCount >= 100) {
                 bottle.src = "bottle-stage1.png";
             } else {
                 bottle.src = "bottle.png";
@@ -111,6 +113,8 @@
             cursor: pointer;
             border: #ffffff;
             background-color: #ffffff;
+            color: black;
+            
         }
     </style>
 </head>
