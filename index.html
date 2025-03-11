@@ -62,7 +62,7 @@
             const docSnap = await getDoc(bottleRef);
             if (docSnap.exists()) {
                 let clickCount = docSnap.data().clicks;
-                if (clickCount < 100) {
+                if (clickCount < 200) {
                     await updateDoc(bottleRef, { clicks: clickCount + 1 });
                 }
             } else {
